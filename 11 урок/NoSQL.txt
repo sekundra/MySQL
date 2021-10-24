@@ -1,0 +1,75 @@
+// Redis
+1. В базе данных Redis подберите коллекцию для подсчета посещений с определенных IP-адресов.
+nina@nina-VirtualBox:~$ redis-cli
+127.0.0.1:6379> ping
+PONG
+127.0.0.1:6379> HINCRBY addresses '10.1.1.1' 1
+(integer) 1
+127.0.0.1:6379> HINCRBY addresses '10.1.1.2' 1
+(integer) 1
+127.0.0.1:6379> HINCRBY addresses '10.1.1.2' 2
+(integer) 3
+127.0.0.1:6379> HGETALL addresses
+1) "10.1.1.1"
+2) "1"
+3) "10.1.1.2"
+4) "3"
+127.0.0.1:6379> 
+
+2. При помощи базы данных Redis решите задачу поиска имени пользователя по электронному адресу и наоборот, поиск электронного адреса пользователя по его имени.
+
+127.0.0.1:6379> HSET emails 'ivan' 'ivan@example.com'
+(integer) 1
+127.0.0.1:6379> HSET emails 'petr' 'petr@example.com'
+(integer) 1
+127.0.0.1:6379> HGET emails 'petr'
+"petr@example.com"
+127.0.0.1:6379> HSET users 'petr@example.com' 'petr'
+(integer) 1
+127.0.0.1:6379> HSET users 'ivan@example.com' 'ivan'
+(integer) 1
+127.0.0.1:6379> HGET users 'ivan@example.com'
+"ivan"
+
+//MongoDB
+3.Организуйте хранение категорий и товарных позиций учебной базы данных shop в СУБД MongoDB.
+nina@nina-VirtualBox:~$ sudo systemctl start mongod.service
+nina@nina-VirtualBox:~$ mongo
+MongoDB shell version v4.4.10
+connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("4479d359-e358-48fa-b33e-891b9ce48f8f") }
+MongoDB server version: 4.4.10
+
+> use shop_db
+switched to db shop_db
+> db.createCollection('catalogs')
+{ "ok" : 1 }
+> db.createCollection('products')
+{ "ok" : 1 }
+> db.catalogs.insert({name:'Материнские платы'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name:'Процессоры'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name:'Жесткие диски'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.find()
+{ "_id" : ObjectId("6171b67f2632afa7f04032b9"), "name" : "Материнские платы" }
+{ "_id" : ObjectId("6171b6902632afa7f04032ba"), "name" : "Процессоры" }
+{ "_id" : ObjectId("6171b69d2632afa7f04032bb"), "name" : "Жесткие диски" }
+
+> db.products.insert({name:'ASUS ROG MAXIMUS X HERO',
+... description:'Материнская плата ASUS ROG MAXIMUS X HERO, Z370, Socket 1151-V2, DDR4, ATX',
+... price: 19310.00,
+... catalog_id: new ObjectId("6171b67f2632afa7f04032b9")})
+WriteResult({ "nInserted" : 1 })
+
+> db.products.insert({name:'AMD FX-8320', description:'Процессор для настольных персональных компьютеров, основанных на платформе AMD.', price: 7120.00, catalog_id: new ObjectId("6171b6902632afa7f04032ba")})
+WriteResult({ "nInserted" : 1 })
+> db.products.find()
+{ "_id" : ObjectId("6171b94d2632afa7f04032c0"), "name" : "AMD FX-8320", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе AMD.", "price" : 7120, "catalog_id" : ObjectId("6171b6902632afa7f04032ba") }
+{ "_id" : ObjectId("6171b9d2e17183afa7e1d137"), "name" : "ASUS ROG MAXIMUS X HERO", "description" : "Материнская плата ASUS ROG MAXIMUS X HERO, Z370, Socket 1151-V2, DDR4, ATX", "price" : 19310, "catalog_id" : ObjectId("6171b67f2632afa7f04032b9") }
+
+> db.products.find({catalog_id: ObjectId("6171b6902632afa7f04032ba")})
+{ "_id" : ObjectId("6171b94d2632afa7f04032c0"), "name" : "AMD FX-8320", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе AMD.", "price" : 7120, "catalog_id" : ObjectId("6171b6902632afa7f04032ba") }
+
+
